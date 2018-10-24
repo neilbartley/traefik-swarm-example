@@ -1,0 +1,36 @@
+version: '3.4'
+
+services:
+  admin:
+    image: jwilder/whoami
+
+    # This links to the network created in the proxy (traefik) stack
+    networks:
+      - traefik_traefik
+
+    # This is where the 'magic' is defined. In a non-swarm environment this would be defined as plain labels.
+    deploy:
+      labels:
+        - "traefik.enable=true"                         # Use traefik for this service
+        - "traefik.backend=admin"                       # What service to talk to
+        - "traefik.frontend.rule=Host:proto1.neil.bar"  # What domain should this service use?
+        - "traefik.docker.network=traefik_traefik"      # The network to use
+        - "traefik.port=8000"                           # The port to use for the service
+
+  backoffice:
+    image: jwilder/whoami
+
+    networks:
+      - traefik_traefik
+
+    deploy:
+      labels:
+        - "traefik.enable=true"
+        - "traefik.backend=backoffice"
+        - "traefik.frontend.rule=Host:proto4.neil.bar"
+        - "traefik.docker.network=traefik_traefik"
+        - "traefik.port=8000"
+
+networks:
+  traefik_traefik:
+    external: true

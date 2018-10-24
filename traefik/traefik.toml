@@ -1,0 +1,41 @@
+debug = false
+
+logLevel = "ERROR"
+defaultEntryPoints = ["https", "http"]
+
+# https://docs.traefik.io/configuration/entrypoints/
+[entryPoints]
+  [entryPoints.http]
+  address = ":80"
+    [entryPoints.http.redirect]  # https://docs.traefik.io/configuration/entrypoints/#redirect-http-to-https
+    entryPoint = "https"
+  [entryPoints.https]
+  address = ":443"
+  [entryPoints.https.tls]
+  [entryPoints.dashboard]
+  address = ":8080"
+    [entryPoints.dashboard.auth]
+      [entryPoints.dashboard.auth.basic]                       # https://docs.traefik.io/configuration/entrypoints/#basic-authentication
+      users = ["admin:$apr1$4Ql9Q00P$ApPURgDvk2z4A2AEqU/TT0"]  # supersecretpassword
+
+[retry]
+
+# https://docs.traefik.io/configuration/backends/docker/
+[docker]
+swarmMode = true
+watch = true
+exposedByDefault = false
+
+# https://docs.traefik.io/configuration/acme/
+[acme]
+email = "n@neil.bar"
+storage = "acme.json"
+entryPoint = "https"
+onHostRule = true
+[acme.httpChallenge]
+entryPoint = "http"
+
+# https://docs.traefik.io/configuration/api/
+[api]
+dashboard = true
+entrypoint = "dashboard"
